@@ -1,0 +1,10 @@
+#!/bin/bash
+# Shell script to grab a screenshot, blur it with ImageMagick
+# and pass it to i3lock
+
+PICTURE="/tmp/i3lock.png"
+
+scrot $PICTURE
+magick $PICTURE -scale 10% -blur 0x -resize 1000% -pointsize 108 -font Tengwar-Parmaite -fill '#ffc200' -undercolor '#000000' -annotate +100+100 "ql2h yljjh6 ] y\`5h -" -font Bookman-LightItalic  -fill '#ffffff' -undercolor '#000000' -pointsize 64 -annotate +100+200 "    \"Speak, friend, and enter.\"" $PICTURE
+i3lock -i $PICTURE
+rm $PICTURE
