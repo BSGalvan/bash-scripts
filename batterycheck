@@ -1,0 +1,42 @@
+#!/bin/bash
+# Monitor the battery level and send a notification if it falls below 20%.
+# Also notify if the battery is fully charged.
+
+# Get adapter status. '0' if offline/discharging, '1' if online/charging.
+STATUS=$(cat /sys/class/power_supply/ADP0/online)
+
+# Get battery capacity.
+BAT_LVL=$(cat /sys/class/power_supply/BAT0/capacity)
+
+# Hard limits for cautions
+LOW_CAP=20 # how low is too low?
+FULL_CAP=100 # full capacity
+
+# Eye Candy
+
+ICON_LOW="/usr/share/icons/gnome/32x32/status/battery-caution.png"
+ICON_FULL="/usr/share/icons/gnome/32x32/status/battery-full-charged.png"
+ICON_CHARGING="/usr/share/icons/gnome/32x32/status/battery-low-charging.png"
+ICON_DISCHARGING="/usr/share/icons/gnome/32x32/status/battery-good.png"
+
+# Persistence for one-time notifications
+
+CHARGE_FILE="/home/bharath/scripts/charge"
+DISCHARGE_FILE="/home/bharath/scripts/discharge"
+
+# Case 1, caution that battery is low.
+
+[ "$STATUS" -eq 0 -a $BAT_LVL -le $LOW_CAP ] && /usr/bin/notify-send -i $ICON_LOW -u critical "Battery Low!" "Battery level is ${BAT_LVL}%.\n Plug in your charger."
+
+# Case 2, caution that battery is full.
+
+[ "$STATUS" -eq 1 -a $BAT_LVL -eq $FULL_CAP ] && /usr/bin/notify-send -i $ICON_FULL -u normal "Battery Full." "Battery at ${BAT_LVL}%.\n Unplug your charger."
+
+# Case 3, notify that battery is charging, once, when plugging into the wall.
+
+[ "$STATUS" -eq 1 -a  ! -f $CHARGE_FILE ] && notify-send -i $ICON_CHARGING -u low "Battery Charging." "Current battery level is ${BAT_LVL}%." && touch $CHARGE_FILE && [ -f $DISCHARGE_FILE ] && rm $DISCHARGE_FILE
+
+# Case 4, notify that battery is discharging, once, when plugging out of the wall.
+
+[ "$STATUS" -eq 0 -a ! -f $DISCHARGE_FILE ] && notify-send -i $ICON_DISCHARGING -u low "Battery Discharging." "Current battery level is ${BAT_LVL}%." && touch $DISCHARGE_FILE && [ -f $CHARGE_FILE ] && rm $CHARGE_FILE
+
