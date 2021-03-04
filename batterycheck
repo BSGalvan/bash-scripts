@@ -2,11 +2,14 @@
 # Monitor the battery level and send a notification if it falls below 20%.
 # Also notify if the battery is fully charged.
 
+# Path to sysfs power_supply
+POW_PATH="/sys/class/power_supply"
+
 # Get adapter status. '0' if offline/discharging, '1' if online/charging.
-STATUS=$(cat /sys/class/power_supply/ADP0/online)
+STATUS=$(cat $POW_PATH/ADP0/online)
 
 # Get battery capacity.
-BAT_LVL=$(cat /sys/class/power_supply/BAT0/capacity)
+BAT_LVL=$(cat $POW_PATH/BAT0/capacity)
 
 # Hard limits for cautions
 LOW_CAP=20 # how low is too low?
@@ -14,29 +17,55 @@ FULL_CAP=100 # full capacity
 
 # Eye Candy
 
-ICON_LOW="/usr/share/icons/gnome/32x32/status/battery-caution.png"
-ICON_FULL="/usr/share/icons/gnome/32x32/status/battery-full-charged.png"
-ICON_CHARGING="/usr/share/icons/gnome/32x32/status/battery-low-charging.png"
-ICON_DISCHARGING="/usr/share/icons/gnome/32x32/status/battery-good.png"
+ICON_DIR="/usr/share/icons/gnome/32x32/status"
+LOW="$ICON_DIR/battery-caution.png"
+FULL="$ICON_DIR/battery-full-charged.png"
+CHARGING="$ICON_DIR/battery-low-charging.png"
+DISCHARGING="$ICON_DIR/battery-good.png"
 
 # Persistence for one-time notifications
 
 CHARGE_FILE="/home/bharath/scripts/charge"
 DISCHARGE_FILE="/home/bharath/scripts/discharge"
 
+# TODO: How much time is left for the battery to discharge?
+
+
 # Case 1, caution that battery is low.
 
-[ "$STATUS" -eq 0 -a $BAT_LVL -le $LOW_CAP ] && /usr/bin/notify-send -i $ICON_LOW -u critical "Battery Low!" "Battery level is ${BAT_LVL}%.\n Plug in your charger."
+[ "$STATUS" -eq 0 -a $BAT_LVL -le $LOW_CAP ] && \
+	$(which notify-send) -i $LOW \
+	-t 5000 -u critical \
+	"Battery Low!" "Battery level is ${BAT_LVL}%.\n Plug in your charger."
 
 # Case 2, caution that battery is full.
 
-[ "$STATUS" -eq 1 -a $BAT_LVL -eq $FULL_CAP ] && /usr/bin/notify-send -i $ICON_FULL -u normal "Battery Full." "Battery at ${BAT_LVL}%.\n Unplug your charger."
+[ "$STATUS" -eq 1 -a $BAT_LVL -eq $FULL_CAP ] && \
+	$(which notify-send) -i $FULL \
+	-t 5000 -u normal \
+	"Battery Full." "Battery at ${BAT_LVL}%.\n Unplug your charger."
 
 # Case 3, notify that battery is charging, once, when plugging into the wall.
 
-[ "$STATUS" -eq 1 -a  ! -f $CHARGE_FILE ] && notify-send -i $ICON_CHARGING -u low "Battery Charging." "Current battery level is ${BAT_LVL}%." && touch $CHARGE_FILE && [ -f $DISCHARGE_FILE ] && rm $DISCHARGE_FILE
+[ "$STATUS" -eq 1 -a  ! -f $CHARGE_FILE ] && \
+	$(which notify-send) -i $CHARGING \
+	-t 3000 -u low \
+	"Battery Charging." "Current battery level is ${BAT_LVL}%." && \
+	touch $CHARGE_FILE && \ 
+	[ -f $DISCHARGE_FILE ] && rm $DISCHARGE_FILE
 
 # Case 4, notify that battery is discharging, once, when plugging out of the wall.
 
-[ "$STATUS" -eq 0 -a ! -f $DISCHARGE_FILE ] && notify-send -i $ICON_DISCHARGING -u low "Battery Discharging." "Current battery level is ${BAT_LVL}%." && touch $DISCHARGE_FILE && [ -f $CHARGE_FILE ] && rm $CHARGE_FILE
+[ "$STATUS" -eq 0 -a ! -f $DISCHARGE_FILE ] && \
+	T=$(echo "( $(cat $POW_PATH/BAT0/energy_now) / $(cat $POW_PATH/BAT0/power_now) )" | bc ) \
+	H=$(echo "scale=0; $T / 1" | bc ) \
+	M=$(echo "scale=0; (($T - $H) * 60) / 1" | bc ) \
+	S=$(echo "scale=0; ((($T - $H) * 60 - $M) * 60) / 1" | bc ) \
+	REM="${H}h ${M}m ${S}s Remaining" && \
+	$(which notify-send) -i $DISCHARGING \
+	-t 3000 -u low \
+	"Battery Discharging." "Current battery level is ${BAT_LVL}%.\n$REM." && \
+	touch $DISCHARGE_FILE && \
+	[ -f $CHARGE_FILE ] && rm $CHARGE_FILE
 
+unset 

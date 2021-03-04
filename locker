@@ -1,10 +1,52 @@
 #!/bin/bash
-# Shell script to grab a screenshot, blur it with ImageMagick
-# and pass it to i3lock
+# Shell script to grab a screenshot, edit it with ImageMagick
+# and pass it to i3lock(-color)
 
 PICTURE="/tmp/i3lock.png"
 
+# Take a screenshot of current state (across monitors)
 scrot $PICTURE
-magick $PICTURE -scale 10% -blur 0x -resize 1000% -pointsize 108 -font Tengwar-Parmaite -fill '#ffc200' -undercolor '#000000' -annotate +100+100 "ql2h yljjh6 ] y\`5h -" -font Bookman-LightItalic  -fill '#ffffff' -undercolor '#000000' -pointsize 64 -annotate +100+200 "    \"Speak, friend, and enter.\"" $PICTURE
-i3lock -i $PICTURE
+
+# Colour definitions       # What is the color for?
+insidecolor=00000033       # interior circle (resting)
+insidevercolor=005f0033    # |=====||======> (verif)
+insidewrongcolor=ff000033  # |=====||======> (wrong)
+ringcolor=aeaeae66         # surrounding ring  
+ringvercolor=28960066      # |=====||======> (verif)
+ringwrongcolor=ff000066    # |=====||======> (wrong)
+keyhlcolor=76b739ff        # highlight       (keys)
+bshlcolor=ffa800ff         # |=====||======> (bksp)
+separatorcolor=00000000    # separator (b/w keyhls)
+verifcolor=ffffffff        # status text     (verif)
+timecolor=6e0096ff         # time text
+datecolor=6e0096ff         # date text
+font="mono"
+
+# Do shrink-blur-dim-enlarge + add text on top
+magick $PICTURE \
+	-scale 10% -blur 0x1 -colorize 40% -resize 1000% \
+	-gravity NorthWest \
+	-pointsize 80 -font Tengwar-Parmaite \
+	-fill '#6e0096' -undercolor '#000000' \
+	-annotate +100+100 "ql2h yljjh6 ] y\`5h -" \
+	$PICTURE
+	#-pointsize 50 -font Bookman-LightItalic \
+	#-fill '#ffffff' -undercolor '#000000' \
+	#-annotate +100+250 "    \"Speak, friend, and enter.\"" \
+
+# Lock the screen
+i3lock --image=$PICTURE \
+	--clock \
+	--insidecolor=$insidecolor --ringcolor=$ringcolor --line-uses-inside \
+	--keyhlcolor=$keyhlcolor --bshlcolor=$bshlcolor --separatorcolor=$separatorcolor \
+	--insidevercolor=$insidevercolor --insidewrongcolor=$insidewrongcolor \
+	--ringvercolor=$ringvercolor --ringwrongcolor=$ringwrongcolor \
+	--radius=120 --ring-width=10 --veriftext='' --wrongtext='' --noinputtext=''\
+	--timecolor="$timecolor" --datecolor="$datecolor" \
+	--time-font="$font" \
+	--date-font="$font" --datestr="%a %b %d, %Y"\
+	--force-clock \
+	--pass-media-keys \
+
+# Remove the screenshot file
 rm $PICTURE
