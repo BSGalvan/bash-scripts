@@ -11,7 +11,7 @@ scrot $PICTURE
 insidecolor=00000033       # interior circle (resting)
 insidevercolor=005f0033    # |=====||======> (verif)
 insidewrongcolor=ff000033  # |=====||======> (wrong)
-ringcolor=aeaeae66         # surrounding ring  
+ringcolor=aeaeae66         # surrounding ring
 ringvercolor=28960066      # |=====||======> (verif)
 ringwrongcolor=ff000066    # |=====||======> (wrong)
 keyhlcolor=76b739ff        # highlight       (keys)
