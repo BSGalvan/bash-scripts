@@ -18,8 +18,8 @@ keyhlcolor=76b739ff        # highlight       (keys)
 bshlcolor=ffa800ff         # |=====||======> (bksp)
 separatorcolor=00000000    # separator (b/w keyhls)
 verifcolor=ffffffff        # status text     (verif)
-timecolor=6e0096ff         # time text
-datecolor=6e0096ff         # date text
+timecolor=ffffffff         # time text
+datecolor=ffffffff         # date text
 font="mono"
 
 # Do shrink-blur-dim-enlarge + add text on top
