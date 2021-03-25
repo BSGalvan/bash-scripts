@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Program to display list of references in a user-specified folder, choose one from it and open it.
+
+folder="/home/bharath/Desktop/a-tale-of-two-dead-stars/references"
+reference=$(ls $folder/*.pdf | sed "s:/.*/::g" | dmenu -i -l 20 -p "Choose reference:")
+
+# If no file chosen, exit quietly.
+[ -z "$reference" ] && exit
+
+# If file chosen exists, open and exit.
+[ -e "$folder/$reference" ] && (zathura "$folder/$reference" &) && exit
+
+# If file chosen doesn't exist, complain and exit.
+[ ! -e "$folder/$reference" ] && echo "Error: "$reference" not found!" && exit 1
+
