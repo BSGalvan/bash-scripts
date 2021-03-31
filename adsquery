@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Program to query the Astrophysics Data System (NASA/ADS) via the terminal.
+# Currently accepts author:"^Author, First", year:YYYY style queries.
+
+# Defining our web browser.
+DMBROWSER="brave"
+
+# Ask for a query.
+# The <&- is to close STDIN.
+query=$(dmenu -p "Enter your ADS query" <&- | sed "s/,//g")
+
+# Refine the query.
+author=$(echo $query | awk '{print $1}')
+year=$(echo $query | awk '{print $NF}')
+
+# Prepare the query with HTML encoding.
+url="https://ui.adsabs.harvard.edu/search/q="
+webquery="author%3A\"%5E$author\"%2C%20year%3A$year&sort=citation_count%20desc%2C%20bibcode%20desc&p_=0"
+
+# Launch the browswer
+$DMBROWSER "$url""$webquery"
+

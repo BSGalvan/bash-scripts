@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# A small script to pull random quotes from quotable.io and parse the resulting JSON
+# for only the author and quote text.
+
+curl -s "http://api.quotable.io/random?famous-quotes" | jq '.content, .author' | sed "s/\"//g" | cowthink -nb | lolcat

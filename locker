@@ -1,0 +1,57 @@
+#/bin/bash
+# Shell script to grab a screenshot, edit it with ImageMagick
+# and pass it to i3lock(-color)
+
+#PICTURE="/tmp/i3lock.png"
+
+# Take a screenshot of current state (across monitors)
+#scrot $PICTURE
+
+# Colour definitions       # What is the color for?
+insidecolor=6e009655       # interior circle (resting)
+insidevercolor=005f0033    # |=====||======> (verif)
+insidewrongcolor=ff000033  # |=====||======> (wrong)
+ringcolor=00000000         # enclosing ring  (resting)
+ringvercolor=28960011      # |=====||======> (verif)
+ringwrongcolor=ff000066    # |=====||======> (wrong)
+keyhlcolor=76b739ff        # highlight       (keys)
+bshlcolor=ffa800ff         # |=====||======> (bksp)
+separatorcolor=00000000    # separator (b/w keyhls)
+verifcolor=ffffffff        # status text     (verif)
+timecolor=ffffffff         # time text
+datecolor=ffffffff         # date text
+font="mono"
+
+# Do shrink-blur-dim-enlarge + add text on top
+# TODO: Optimize this process!
+# TIP: maybe you can just overlay the tengwar on top of a i3lock-color
+#      blurred image? The blur from the latter seems to run fast!
+#magick $PICTURE \
+	#-scale 10% -blur 0x1 -colorize 40% -resize 1000% \
+	#$PICTURE
+	#-gravity NorthWest \
+	#-pointsize 80 -font Tengwar-Parmaite \
+	#-fill '#6e0096' -undercolor '#000000' \
+	#-annotate +100+100 "ql2h yljjh6 ] y\`5h -" \
+	#-pointsize 50 -font Bookman-LightItalic \
+	#-fill '#ffffff' -undercolor '#000000' \
+	#-annotate +100+250 "    \"Speak, friend, and enter.\"" \
+
+# Lock the screen
+i3lock --color=00000033 \
+	--blur=4 \
+	--clock --force-clock \
+	--indicator \
+	--insidecolor=$insidecolor --ringcolor=$ringcolor --line-uses-inside \
+	--keyhlcolor=$keyhlcolor --bshlcolor=$bshlcolor --separatorcolor=$separatorcolor \
+	--insidevercolor=$insidevercolor --insidewrongcolor=$insidewrongcolor \
+	--ringvercolor=$ringvercolor --ringwrongcolor=$ringwrongcolor \
+	--radius=120 --ring-width=10 --veriftext='' --wrongtext='' --noinputtext=''\
+	--timecolor="$timecolor" --datecolor="$datecolor" \
+	--time-font="$font" \
+	--date-font="$font" --datestr="%a %b %d, %Y" \
+	--pass-media-keys
+#--image=$PICTURE \
+
+# Remove the screenshot file
+#rm $PICTURE
