@@ -33,9 +33,6 @@ font="mono"
 	#-pointsize 80 -font Tengwar-Parmaite \
 	#-fill '#6e0096' -undercolor '#000000' \
 	#-annotate +100+100 "ql2h yljjh6 ] y\`5h -" \
-	#-pointsize 50 -font Bookman-LightItalic \
-	#-fill '#ffffff' -undercolor '#000000' \
-	#-annotate +100+250 "    \"Speak, friend, and enter.\"" \
 
 # Lock the screen
 i3lock --color=00000033 \
