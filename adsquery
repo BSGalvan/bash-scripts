@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Program to query the Astrophysics Data System (NASA/ADS) via the terminal.
 # Currently accepts author:"^Author, First", year:YYYY style queries.
+# TODO: Fix zero-input string behaviour!
 
 # Defining our web browser.
 DMBROWSER="brave"
