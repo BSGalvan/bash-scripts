@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 # Program to query the Astrophysics Data System (NASA/ADS) via the terminal.
 # Currently accepts author:"^Author, First", year:YYYY style queries.
-# TODO: Fix zero-input string behaviour!
+# DONE: Fix zero-input string behaviour!
 
 # Defining our web browser.
 DMBROWSER="brave"
 
 # Ask for a query.
 # The <&- is to close STDIN.
-query=$(dmenu -p "Enter your ADS query" <&- | sed "s/,//g")
+query=$(dmenu -c -bw 2 -fn "Fira Code-12:style=Regular" -p "Enter your ADS query" <&- | sed "s/,//g")
+
+# Check if the query is empty
+[ -z $query ] && exit
 
 # Refine the query.
 author=$(echo $query | awk '{print $1}')
