@@ -2,7 +2,7 @@
 # Program to display list of references in a user-specified folder, choose one from it and open it.
 
 folder="/home/bharath/Desktop/a-tale-of-two-dead-stars/references"
-reference=$(ls $folder/*.pdf | sed "s:/.*/::g" | dmenu -i -bw 3 -fn "Fira Code-12:style=Regular" -c -l 20 -g 2 -p "Choose reference:")
+reference=$(ls $folder/*.pdf | sed "s:/.*/::g" | dmenu -i -bw 3 -c -l 20 -g 2 -p "Choose reference:")
 
 # If no file chosen, exit quietly.
 [ -z "$reference" ] && exit
