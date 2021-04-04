@@ -72,7 +72,7 @@ do
 	then
 		echo "Program terminated." && exit 0
 	else
-		query=$(echo "$engine" | dmenu -p 'Enter search query:') || exit
+		query=$(echo "$engine" | dmenu -c -bw 2 -p 'Enter search query:') || exit
 	fi
 done
 
