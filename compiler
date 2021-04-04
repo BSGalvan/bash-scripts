@@ -16,20 +16,20 @@ ext="${file##*.}"           # --> returns ext
 
 cd "$dir" || exit 1
 
-textype() { \
-	command="pdflatex"
-	( head -n5 "$file" | grep -qi 'xelatex' ) && command="xelatex"
-	$command --output-directory="$dir" "$base" &&   # pdfLaTeX x 1
-	grep -qi addbibresource "$file" &&		# find the .bib file reference...
-	biber --input-directory "$dir" "$base" &&	# ... run biber using it
-	$command --output-directory="$dir" "$base" &&   # pdfLaTeX x 2
-	$command --output-directory="$dir" "$base"
-}
+#textype() { \
+	#command="pdflatex"
+	#( head -n5 "$file" | grep -qi 'xelatex' ) && command="xelatex"
+	#$command --output-directory="$dir" "$base" &&   # pdfLaTeX x 1
+	#grep -qi addbibresource "$file" &&		# find the .bib file reference...
+	#biber --input-directory "$dir" "$base" &&	# ... run biber using it
+	#$command --output-directory="$dir" "$base" &&   # pdfLaTeX x 2
+	#$command --output-directory="$dir" "$base"
+#}
 
 case "$ext" in
 	# Try to keep these cases in alphabetical order.
 	#[0-9]) preconv "$file" | refer -PS -e | groff -mandoc -T pdf > "$base".pdf ;;
-	c) cc "$file" -o "$base" && "$base" ;;
+	c) cc "$file" -o "$base".out && "$base".out ;;
 	cpp) g++ "$file" -o "$base" && "$base" ;;
 	#cs) mcs "$file" && mono "$base".exe ;;
 	#go) go run "$file" ;;
@@ -52,6 +52,6 @@ case "$ext" in
 	#sass) sassc -a "$file" "$base.css" ;;
 	#scad) openscad -o "$base".stl "$file" ;;
 	#sent) setsid -f sent "$file" 2>/dev/null ;;
-	tex) textype "$file" ;;
+	#tex) textype "$file" ;;
 	*) head -n1 "$file" | grep "^#!/" | sed "s/^#!//" | xargs -r -I % "$file" ;;
 esac
