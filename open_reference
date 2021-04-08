@@ -1,14 +1,27 @@
 #!/usr/bin/env bash
 # Program to display list of references in a user-specified folder, choose one from it and open it.
 
-folder="/home/bharath/Desktop/a-tale-of-two-dead-stars/references"
-reference=$(ls $folder/*.pdf | sed "s:/.*/::g" | dmenu -i -bw 3 -c -l 20 -g 2 -p "Choose reference:")
+# An array of folders of interest. Each entry must be of the form
+# folder_shortname - full/path/to/folder
+declare -a folders=(
+"references - /home/bharath/Desktop/a-tale-of-two-dead-stars/references"
+"misc_reading - /home/bharath/Desktop/misc_reading"
+)
+
+while [ -z "$folder" ]
+do
+	folderchoice=$(printf '%s\n' "${folders[@]}" | dmenu -i -c -bw 2 -l 20 -p 'Choose head folder:') || exit
+	folderpath=$(echo "$folderchoice" | awk '{print $NF}')
+	folder=$(echo "$folderchoice" | awk '{print $1}')
+done
+
+reference=$(ls $folderpath/*.pdf $folderpath/*.djvu | sed "s:/.*/::g" | dmenu -i -bw 2 -c -l 20 -g 2 -p "Choose reference from ${folder}:")
 
 # If no file chosen, exit quietly.
 [ -z "$reference" ] && exit
 
 # If file chosen exists, open and exit.
-[ -e "$folder/$reference" ] && (zathura "$folder/$reference" &) && exit
+[ -e "$folderpath/$reference" ] && (zathura "$folderpath/$reference" &) && exit
 
 # If file chosen doesn't exist, complain and exit.
-[ ! -e "$folder/$reference" ] && echo "Error: "$reference" not found!" && exit 1
+[ ! -e "$folderpath/$reference" ] && echo "Error: "$reference" not found!" && exit 1
